@@ -50,7 +50,7 @@ public class ThumbnailsPanel extends JPanel {
 
     protected DocumentViewModel documentViewModel;
 
-    protected float thumbNailZoom = 0.1f; // default zoom is 10%
+    protected float thumbNailZoom = 0.3f; // default zoom is 10%
 
     protected static final int MAX_PAGE_SIZE_READ_AHEAD = 10;
 
@@ -62,8 +62,8 @@ public class ThumbnailsPanel extends JPanel {
         this.propertiesManager = propertiesManager;
         // assign thumbnail zoom from propertiesManager if available
         if (propertiesManager != null) {
-            thumbNailZoom = propertiesManager.getFloat(
-                    PropertiesManager.PROPERTY_UTILITYPANE_THUMBNAILS_ZOOM);
+          /*  thumbNailZoom = propertiesManager.getFloat(
+                    PropertiesManager.PROPERTY_UTILITYPANE_THUMBNAILS_ZOOM);*/
         }
     }
 
@@ -87,8 +87,35 @@ public class ThumbnailsPanel extends JPanel {
 
         final ModifiedFlowLayout layout = new ModifiedFlowLayout();
         final JPanel pageThumbsPanel = new JPanel(layout);
+        
+        //testing code
+        final JLayeredPane layerPane = new JLayeredPane();
+        pageThumbsPanel.setBounds(0, 0, 400, 800);
+        pageThumbsPanel.setOpaque(false);
+        
+        final JPanel overlayer = new JPanel(){
+    		public void paintComponent(Graphics g) {
+    				ImageIcon icon ;
+    				g.drawImage(getBKG(), 0, 0, 1000,1000,this);
+			}
+		};
+		//panel.setLayout(layout);
+		overlayer.setOpaque(false);
+    	
+		overlayer.setBounds(0, 0, 400, 800);
+		
+        
+		final JPanel sumPanel  = new JPanel(layout);
+		sumPanel.setOpaque(false);
+		sumPanel.setBounds(0, 0, 400, 800);
+		sumPanel.add(new JLabel("fefe"));
+		layerPane.add(pageThumbsPanel,new Integer(1));
+		layerPane.add(overlayer,new Integer(2));
+		layerPane.add(sumPanel,new Integer(3));
+        //normal code
+        
         this.setLayout(new BorderLayout());
-        JScrollPane scrollPane = new JScrollPane(pageThumbsPanel,
+        JScrollPane scrollPane = new JScrollPane(layerPane,//pageThumbsPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
@@ -99,8 +126,11 @@ public class ThumbnailsPanel extends JPanel {
         scrollPane.getViewport().addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 JViewport tmp = (JViewport) e.getSource();
-                Dimension dim = layout.computeSize(tmp.getWidth(), pageThumbsPanel);
-                pageThumbsPanel.setPreferredSize(dim);
+                System.out.println("change width to "+tmp.getWidth());
+                pageThumbsPanel.setBounds(0, 0, tmp.getWidth(), tmp.getHeight());
+                overlayer.setBounds(0, 0, tmp.getWidth(), tmp.getHeight());
+             //   Dimension dim = layout.computeSize(tmp.getWidth(), pageThumbsPanel);
+             //   pageThumbsPanel.setPreferredSize(dim);
             }
         });
 
@@ -144,9 +174,28 @@ public class ThumbnailsPanel extends JPanel {
             }
             pageThumbsPanel.add(pageThumbnailComponent);
         }
-
+       
         pageThumbsPanel.revalidate();
+        overlayer.revalidate();
+        sumPanel.revalidate();
+        layerPane.validate();
         scrollPane.validate();
 
     }
+    private Image getBKG(){
+		GraphicsConfiguration gc = this.getGraphicsConfiguration(); // 本地图形设备        
+	        Image img = new ImageIcon("data\\images\\2.png").getImage();
+	       // System.out.print(img.getHeight(frame));
+			Image image = gc.createCompatibleImage(400,400,Transparency.TRANSLUCENT);//建立透明画布
+	        Graphics2D g=(Graphics2D)image.getGraphics(); //在画布上创建画笔
+	  
+	        Composite alpha = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .8f); //指定透明度为半透明90%
+	        g.setComposite(alpha);
+	        g.drawImage(img,0,0, this); //注意是,将image画到g画笔所在的画布上
+	     
+	        g.setColor(Color.gray);//设置颜色为黑色
+	        g.drawString("BACKGROUND", 10, 10);//写字
+	        g.dispose(); //释放内存
+		return image;
+	}
 }

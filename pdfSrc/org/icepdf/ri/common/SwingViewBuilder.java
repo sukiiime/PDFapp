@@ -486,14 +486,14 @@ public class SwingViewBuilder {
     
        
         
-        JPanel vis = new JPanel();
+      /*  JPanel vis = new JPanel();
         vis.setLayout(new BorderLayout());
         
         JPanel graph = RadialGraphView.demo("data/socialnet.xml", "name");
         JComponent pic = DataMountain.demo();
         vis.add(graph,BorderLayout.CENTER);
         vis.add(pic,BorderLayout.SOUTH);
-        cp.add(vis,BorderLayout.EAST);
+        cp.add(vis,BorderLayout.EAST);*/
         
         
         
